@@ -8,16 +8,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	// Create an instance of the app structure
 	app := NewApp()
 
-	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "monitoring-desktop",
+		Title:  "Monitoring",
 		Width:  1024,
 		Height: 768,
 		AssetServer: &assetserver.Options{
@@ -28,6 +25,9 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
+		Frameless: true,
+		DisableResize: true,
+		AlwaysOnTop: true,
 	})
 
 	if err != nil {
