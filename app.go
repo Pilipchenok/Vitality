@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	//"runtime/metrics"
 	"sync"
 	"time"
 	"log"
@@ -24,31 +22,37 @@ type Metric struct {
 	Value float64 `json:"value"`
 }
 
-// App struct
 type App struct {
 	ctx context.Context
 	metrics []SliceMetrics
 	mu sync.Mutex
 }
 
-// NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-}
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+	go func() {
+    ticker := time.NewTicker(2 * time.Second)
+    defer ticker.Stop()
+
+    for {
+      select {
+      case <-ctx.Done():
+        return 
+      case <-ticker.C:
+        a.CollectMetrics()
+      }
+    }
+  }()
 }
 
 func (a *App) CollectMetrics() {
 	var collected SliceMetrics
+	collected.CheckTime = time.Now()
 
 	vMem, err := mem.VirtualMemory()
 	if err != nil {
@@ -83,4 +87,11 @@ func (a *App) CollectMetrics() {
 	a.mu.Unlock()
 }
 
+func (a *App) GetHistory() []SliceMetrics {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	result := make([]SliceMetrics, len(a.metrics))
+	copy(result, a.metrics)
 
+	return result
+}
