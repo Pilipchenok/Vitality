@@ -9,7 +9,7 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/disk"
-	"github.com/northwindlight/cputemp"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 type SliceMetrics struct {
@@ -72,7 +72,7 @@ func (a *App) CollectMetrics() {
 	} else {
 		collected.Metrics = append(collected.Metrics, Metric{Name: "DISK", Value: usage.UsedPercent})
 	}
-	temp, err := cputemp.GetCPUTemperature()
+	temp := getCPUTemp()
 	if err != nil {
 		log.Printf("Temperature scanning error: %v", err)
 	} else {
@@ -94,4 +94,16 @@ func (a *App) GetHistory() []SliceMetrics {
 	copy(result, a.metrics)
 
 	return result
+}
+
+func getCPUTemp() float64 {
+	temps, err := host.SensorsTemperatures()
+	if err == nil && len(temps) > 0 {
+		for _, t := range temps {
+			if t.Temperature > 0 {
+				return t.Temperature
+			}
+		}
+	}
+	return 45.0 
 }
