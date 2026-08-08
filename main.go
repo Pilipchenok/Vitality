@@ -6,6 +6,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 var assets embed.FS
@@ -28,6 +29,9 @@ func main() {
 		Frameless: true,
 		DisableResize: true,
 		AlwaysOnTop: true,
+		Windows: &windows.Options{
+      Theme: windows.Dark,
+    },
 	})
 
 	if err != nil {
