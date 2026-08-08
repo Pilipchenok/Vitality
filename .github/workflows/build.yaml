@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
       - name: Установка Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
 
       - name: Установка Node.js
         uses: actions/setup-node@v4
@@ -29,7 +30,9 @@ jobs:
 
       - name: Установка графических библиотек Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential pkg-config
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential pkg-config
 
       - name: Установка Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
