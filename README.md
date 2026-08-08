@@ -1,19 +1,53 @@
-# README
+# Pulse Monitor
 
-## About
+Pulse Monitor — десктопное приложение для мониторинга системных ресурсов macOS в реальном времени. Написано на Go с использованием фреймворка Wails и ванильного JavaScript для интерфейса.
 
-This is the official Wails Vanilla template.
+![Скриншот интерфейса](images/screenshot.png)
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+## Возможности
 
-## Live Development
+- **Системные метрики:** отслеживание загрузки CPU, RAM, процентного заполнения диска и температуры с интервалом обновления в 1 секунду.
+- **Нативный UX macOS:**
+  - Окно со скрытой рамкой и сохранением системных кнопок.
+  - Нативная область перетаскивания окна.
+  - Работа в фоне: при нажатии на крестик окно скрывается, а процесс продолжается в Dock.
+- **Буферизация:** хранение истории показателей для отрисовки плавных графиков без нагрузки на систему.
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## Архитектура и стек
 
-## Building
+Приложение собрано в один компактный бинарник без использования внешних HTTP-серверов:
 
-To build a redistributable, production mode package, use `wails build`.
+- **Backend (Go):** сбор показателей через `gopsutil`.
+- **IPC (Wails):** прямой вызов Go-методов из JavaScript через биндинги в памяти.
+- **Frontend (JS / HTML / CSS):** интерфейс без тяжелых фреймворков, визуализация графиков на Canvas с помощью `Chart.js`.
+
+## Установка и запуск
+
+### Скачать готовый релиз
+
+1. Перейдите в раздел [Releases](../../releases).
+2. Скачайте файл `Monitoring-v1.dmg`.
+3. Откройте `.dmg` и перетащите `Monitoring` в папку `Applications`.
+
+> **Внимание:** так как сборка не подписана сертификатом Apple Developer, при первом запуске используйте клик правой кнопкой мыши: **ПКМ -> Открыть**.
+
+### Сборка из исходников
+
+Для сборки требуются **Go 1.21+**, **Node.js** и установленный **Wails CLI** (`go install github.com/wailsapp/wails/v2/cmd/wails@latest`).
+
+## Клонировать репозиторий
+```bash
+git clone [https://github.com/ВАШ_ЛОГИН/pulse-monitor.git](https://github.com/ВАШ_ЛОГИН/pulse-monitor.git)
+cd pulse-monitor
+```
+
+## Запуск в режиме разработки (Hot Reload)
+```bash
+wails dev
+```
+
+## Релизная сборка приложения для macOS
+```bash
+cd frontend && npm install && npm run build && cd ..
+wails build -clean
+```
