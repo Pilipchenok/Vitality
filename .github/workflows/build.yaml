@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-22.04]
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Скачивание кода
@@ -41,9 +41,13 @@ jobs:
         if: runner.os == 'macOS'
         run: wails build -platform darwin/universal -clean
 
-      - name: Сборка для Windows и Linux
-        if: runner.os != 'macOS'
-        run: wails build -clean
+      - name: Сборка для Windows
+        if: runner.os == 'Windows'
+        run: wails build -clean 
+
+      - name: Сборка для Linux
+        if: runner.os == 'Linux'
+        run: wails build -tags webkit2_41 -clean
 
       - name: Сохранение готовых программ
         uses: actions/upload-artifact@v4

@@ -51,3 +51,14 @@ wails dev
 cd frontend && npm install && npm run build && cd ..
 wails build -clean
 ```
+
+### Для пользователей Linux (Ubuntu/Debian)
+
+Поскольку в Linux существует множество различных графических оболочек, приложение использует системный движок **WebKitGTK** для отрисовки интерфейса. 
+
+Если при запуске ничего не происходит или система просит зависимости, установите их одной командой в терминале:
+
+```bash
+sudo apt update
+sudo apt install -y libwebkit2gtk-4.1-0
+```
