@@ -37,7 +37,7 @@ Pulse Monitor — десктопное приложение для монито�
 
 ## Клонировать репозиторий
 ```bash
-git clone [https://github.com/ВАШ_ЛОГИН/pulse-monitor.git](https://github.com/ВАШ_ЛОГИН/pulse-monitor.git)
+git clone https://github.com/Pilipchenok/monitoring-desktop.git
 cd pulse-monitor
 ```
 
