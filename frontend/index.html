@@ -195,7 +195,7 @@ button:active:not(:disabled){transform:scale(.98)}
       </svg>
     </div>
     <div>
-      <div class="brand-title">Мониторинг серверов</div>
+      <div class="brand-title">Мониторинг системы</div>
       <div class="brand-sub">Live-телеметрия · Wails + Go</div>
     </div>
   </div>
@@ -533,7 +533,7 @@ async function loadHosts(){
   }));
   renderTabs();
   setApiStatus(true);
-  pushEvent('ok', `Список хостов загружен (${hosts.length})`, 'Go');
+  pushEvent('ok', `Список метрик загружен (${hosts.length})`, 'Go');
   await selectHost(hosts[0].id);
 }
 
