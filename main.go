@@ -57,7 +57,21 @@ func main() {
 	myAppBackend.appInstance = app
 
 	systray := app.SystemTray.New()
-	systray.SetLabel("⚡")
+	systray.SetLabel("Vitality")
+
+	trayMenu := app.NewMenu()
+	trayMenu.Add("Открыть виджет").OnClick(func(ctx *application.Context) {
+		myAppBackend.ToggleWidget()
+	})
+	trayMenu.Add("Открыть дашборд").OnClick(func(ctx *application.Context) {
+		myAppBackend.ExpandToDashboard()
+	})
+	trayMenu.AddSeparator()
+	trayMenu.Add("Завершить работу").OnClick(func(ctx *application.Context) {
+		app.Quit()
+	})
+
+	systray.SetMenu(trayMenu)
 
 	widgetWin := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:       "Vitality Widget",
@@ -67,7 +81,7 @@ func main() {
 		MinHeight:   320,
 		MaxWidth:    250,
 		MaxHeight:   320,
-		Frameless:   true, 
+		Frameless:   true,
 		AlwaysOnTop: true,
 		Hidden:      true,
 		URL:         "/#widget",
