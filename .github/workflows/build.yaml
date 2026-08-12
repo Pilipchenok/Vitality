@@ -34,23 +34,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev build-essential pkg-config
 
-      - name: Установка Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - name: Сборка фронтенда
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
-      - name: Сборка для macOS (Universal)
+      - name: Сборка для macOS
         if: runner.os == 'macOS'
-        run: wails build -platform darwin/universal -clean
+        run: |
+          mkdir -p bin
+          go build -o bin/Vitality .
 
       - name: Сборка для Windows
         if: runner.os == 'Windows'
-        run: wails build -clean 
+        run: |
+          mkdir bin
+          go build -ldflags "-H windowsgui" -o bin/Vitality.exe .
 
       - name: Сборка для Linux
         if: runner.os == 'Linux'
-        run: wails build -tags webkit2_41 -clean
+        run: |
+          mkdir -p bin
+          go build -tags webkit2_41 -o bin/Vitality .
 
       - name: Сохранение готовых программ
         uses: actions/upload-artifact@v4
         with:
           name: Monitor-${{ runner.os }}
-          path: build/bin/*
+          path: bin/*
