@@ -70,3 +70,12 @@ go run .
 sudo apt update
 sudo apt install -y libwebkit2gtk-4.1-0
 ```
+
+
+### Для пользователей macOS
+
+Если MacOS блокирует открытие приложения, переместите Vitality в папку **Applications** и выполните команду:
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/Vitality.app
+```
