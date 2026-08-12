@@ -42,9 +42,8 @@ button:active:not(:disabled){transform:scale(.98)}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:10px 16px;background:rgba(7,10,15,.9);border-bottom:1px solid var(--border);
-  -webkit-app-region:drag;flex-shrink:0;
+  flex-shrink:0;
 }
-.topbar button{-webkit-app-region:no-drag;}
 .brand{display:flex;align-items:center;gap:11px;min-width:0}
 .logo{
   width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;
@@ -160,7 +159,6 @@ button:active:not(:disabled){transform:scale(.98)}
 .snap-table td:first-child{color:var(--dim)}
 .snap-table .hi{color:var(--red)}.snap-table .mid{color:var(--amber)}.snap-table .lo{color:var(--text)}
 
-
 .events{flex:1;min-height:180px;display:flex;flex-direction:column;overflow-y:auto;margin:0 -6px;padding:0 6px;user-select:text;-webkit-user-select:text}
 .event{display:flex;gap:13px;padding:13px 4px;border-bottom:1px solid rgba(255,255,255,.05);animation:slideIn .3s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
@@ -183,163 +181,257 @@ button:active:not(:disabled){transform:scale(.98)}
   .chart-panel,.side-col{grid-column:span 12}
   .chart-wrap{min-height:260px}
 }
+
+#view-widget {
+  display: flex; flex-direction: column; height: 100vh; width: 100vw;
+  min-width: 250px; min-height: 320px;
+  background: radial-gradient(400px 300px at 50% 0%, rgba(34,211,238,.09), transparent 80%), var(--bg);
+  border: 1px solid var(--border);
+  user-select: none;
+  cursor: default;
+}
+
+.widget-metrics {
+  flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 16px; gap: 12px;
+}
+.widget-metric-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--panel2); padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.widget-footer {
+  padding: 14px 16px; display: flex; gap: 8px;
+  border-top: 1px solid var(--border); background: var(--panel);
+}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="logo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="2 12 6 12 9 5 14 19 17 12 22 12"/>
-      </svg>
+<div id="view-widget">
+  <header class="topbar" style="border-bottom: none; background: transparent;">
+    <div class="brand" style="margin: 0 auto;">
+      <div class="logo" style="width: 24px; height: 24px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
+      </div>
+      <div class="brand-title" style="font-size: 13px;">Vitality</div>
     </div>
-    <div>
-      <div class="brand-title">Мониторинг системы</div>
-      <div class="brand-sub">Live-телеметрия · Wails + Go</div>
-    </div>
-  </div>
-  <div class="top-right">
-    <div class="live-badge" id="liveBadge"><span class="live-dot"></span><span id="liveText">LIVE</span></div>
-    <div class="clock"><span id="clockTime">--:--:--</span><small id="clockDate"></small></div>
-    <button class="btn" id="pauseBtn" title="Приостановить опрос (пробел недоступен в полях)">
-      <svg id="pauseIco" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-      <span id="pauseTxt">Пауза</span>
-    </button>
-  </div>
-</header>
+  </header>
 
-<div class="toolbar">
-  <div class="seg" id="serverTabs">
-    <button disabled><span class="seg-txt">Загрузка списка серверов…</span></button>
-  </div>
-  <div class="toolbar-right">
-    <span class="range-label">Окно</span>
-    <div class="seg seg-sm" id="rangeSeg">
-      <button data-range="5м">5м</button>
-      <button data-range="15м" class="active">15м</button>
-      <button data-range="30м">30м</button>
+  <div class="widget-metrics">
+    <div class="widget-metric-row">
+      <div class="kpi-head" style="gap: 6px;"><span class="kpi-label">CPU</span></div>
+      <div class="kpi-val" style="color: var(--cyan);"><span class="num" id="w-cpu" style="font-size: 18px;">—</span><span class="unit">%</span></div>
     </div>
+    <div class="widget-metric-row">
+      <div class="kpi-head" style="gap: 6px;"><span class="kpi-label">RAM</span></div>
+      <div class="kpi-val" style="color: var(--violet);"><span class="num" id="w-ram" style="font-size: 18px;">—</span><span class="unit">%</span></div>
+    </div>
+    <div class="widget-metric-row">
+      <div class="kpi-head" style="gap: 6px;"><span class="kpi-label">TEMP</span></div>
+      <div class="kpi-val" style="color: var(--red);"><span class="num" id="w-temp" style="font-size: 18px;">—</span><span class="unit">°C</span></div>
+    </div>
+  </div>
+
+  <div class="widget-footer">
+    <button class="btn" style="flex: 1; justify-content: center; border-color: rgba(34,211,238,0.3); color: var(--cyan);" onclick="switchToDashboard()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Дашборд
+    </button>
   </div>
 </div>
 
-<main class="grid">
 
-  <div class="kpi-row">
-    <div class="panel kpi" style="--kc:#22d3ee">
-      <div class="kpi-head">
-        <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></span>
-        <span class="kpi-label">Загрузка CPU</span>
-        <span class="pill ok" id="b-cpu">ожидание</span>
+<div id="view-dashboard" style="display: none; height: 100%; flex-direction: column;">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
       </div>
-      <div class="kpi-val"><span class="num" id="v-cpu">—</span><span class="unit">%</span></div>
-      <div class="kpi-sub" id="d-cpu">нет данных</div>
-      <canvas class="spark" id="s-cpu"></canvas>
-      <div class="kpi-bar"><i id="bar-cpu" style="width:0%"></i></div>
-    </div>
-
-    <div class="panel kpi" style="--kc:#a78bfa">
-      <div class="kpi-head">
-        <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 11v2M11 11v2M15 11v2M6 17v2M12 17v2M18 17v2"/></svg></span>
-        <span class="kpi-label">Память (RAM)</span>
-        <span class="pill ok" id="b-ram">ожидание</span>
-      </div>
-      <div class="kpi-val"><span class="num" id="v-ram">—</span><span class="unit">%</span></div>
-      <div class="kpi-sub" id="d-ram">нет данных</div>
-      <canvas class="spark" id="s-ram"></canvas>
-      <div class="kpi-bar"><i id="bar-ram" style="width:0%"></i></div>
-    </div>
-
-    <div class="panel kpi" style="--kc:#fbbf24">
-      <div class="kpi-head">
-        <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5V12c0 1.7 3.6 3 8 3s8-1.3 8-3V5.5"/><path d="M4 12v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V12"/></svg></span>
-        <span class="kpi-label">Диск</span>
-        <span class="pill ok" id="b-disk">ожидание</span>
-      </div>
-      <div class="kpi-val"><span class="num" id="v-disk">—</span><span class="unit">%</span></div>
-      <div class="kpi-sub" id="d-disk">нет данных</div>
-      <canvas class="spark" id="s-disk"></canvas>
-      <div class="kpi-bar"><i id="bar-disk" style="width:0%"></i></div>
-    </div>
-
-    <div class="panel kpi" style="--kc:#f87171">
-      <div class="kpi-head">
-        <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></span>
-        <span class="kpi-label">Температура CPU</span>
-        <span class="pill ok" id="b-net">ожидание</span>
-      </div>
-      <div class="kpi-val"><span class="num" id="v-net">—</span><span class="unit">°C</span></div>
-      <div class="kpi-sub" id="d-net">нет данных</div>
-      <canvas class="spark" id="s-net"></canvas>
-      <div class="kpi-bar"><i id="bar-net" style="width:0%"></i></div>
-    </div>
-  </div>
-
-  <section class="panel chart-panel">
-    <div class="panel-head">
       <div>
-        <h3>Загрузка ресурсов</h3>
-        <div class="sub">CPU · ОЗУ · Диск, % (левая ось) · TEMP, °C (правая ось)</div>
-      </div>
-      <span class="pill ok" id="chartRangePill">окно: 15м</span>
-    </div>
-    <div class="chart-wrap">
-      <canvas id="resourcesChart"></canvas>
-      <div class="chart-empty" id="mainEmpty">Ожидание данных от Go-бэкенда…</div>
-    </div>
-  </section>
-
-  <div class="side-col">
-    <div class="panel">
-      <div class="panel-head">
-        <h3>Состояние узла</h3>
-        <span class="pill ok" id="nodeStatus">Подключение…</span>
-      </div>
-      <div class="health-body">
-        <div class="gauge">
-          <svg viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" class="g-bg"/>
-            <circle cx="60" cy="60" r="52" class="g-fg" id="gaugeFg" stroke-dashoffset="326.7"/>
-          </svg>
-          <div class="gauge-center"><div class="gauge-val" id="healthVal">—</div><div class="gauge-lbl" id="healthLbl">Индекс</div></div>
-        </div>
-        <div class="facts">
-          <div class="fact"><div class="fl">Хост</div><div class="fv" id="f-host">—</div></div>
-          <div class="fact"><div class="fl">ID</div><div class="fv" id="f-id">—</div></div>
-          <div class="fact"><div class="fl">Источник</div><div class="fv">GetHistory() · Go</div></div>
-          <div class="fact"><div class="fl">Сбор метрик</div><div class="fv">каждые 2 с</div></div>
-          <div class="fact"><div class="fl">Точек в буфере</div><div class="fv" id="f-points">0</div></div>
-          <div class="fact"><div class="fl">Обновлено</div><div class="fv" id="f-upd">—</div></div>
-        </div>
+        <div class="brand-title">Vitality</div>
+        <div class="brand-sub" id="sysHardware">Инициализация...</div>
       </div>
     </div>
+    <div class="top-right">
+      <button class="btn" onclick="switchToWidget()" style="margin-right: 12px; border-color: rgba(34,211,238,0.3); color: var(--cyan);">
+        ← В виджет
+      </button>
 
-    <div class="panel">
-      <div class="panel-head"><h3>Последние замеры</h3><span class="count-badge" id="snapCount">0 точек</span></div>
-      <table class="snap-table">
-        <thead><tr><th>Время</th><th>CPU</th><th>RAM</th><th>Диск</th><th>Темп.</th></tr></thead>
-        <tbody id="snapBody"><tr><td colspan="5" style="color:var(--dim)">нет данных</td></tr></tbody>
-      </table>
+      <div class="live-badge" id="liveBadge"><span class="live-dot"></span><span id="liveText">LIVE</span></div>
+      <div class="clock"><span id="clockTime">--:--:--</span><small id="clockDate"></small></div>
+      <button class="btn" id="pauseBtn" title="Приостановить опрос">
+        <svg id="pauseIco" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        <span id="pauseTxt">Пауза</span>
+      </button>
     </div>
+  </header>
 
-    <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:320px">
-      <div class="panel-head"><h3>Журнал событий</h3><span class="count-badge" id="evCount">0</span></div>
-      <div class="events" id="eventList"></div>
+  <div class="toolbar">
+    <div class="seg" id="serverTabs">
+      <button class="active" disabled>
+        <span class="st"></span><span class="seg-txt">Локальный Mac<small>Мониторинг</small></span>
+      </button>
     </div>
+    <div class="toolbar-right"></div>
   </div>
 
-</main>
+  <main class="grid">
+    <div class="kpi-row">
+      <div class="panel kpi" style="--kc:#22d3ee">
+        <div class="kpi-head">
+          <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></span>
+          <span class="kpi-label">Загрузка CPU</span>
+          <span class="pill ok" id="b-cpu">ожидание</span>
+        </div>
+        <div class="kpi-val"><span class="num" id="v-cpu">—</span><span class="unit">%</span></div>
+        <div class="kpi-sub" id="d-cpu">нет данных</div>
+        <canvas class="spark" id="s-cpu"></canvas>
+        <div class="kpi-bar"><i id="bar-cpu" style="width:0%"></i></div>
+      </div>
 
-<footer class="foot">
-  <span>Последнее обновление: <b id="lastUpd">—</b> · опрос <b>1 с</b> · сбор в Go <b>2 с</b></span>
-  <span>Pulse Monitor · метрики: <b>cpu · ram · disk · temp</b></span>
-</footer>
+      <div class="panel kpi" style="--kc:#a78bfa">
+        <div class="kpi-head">
+          <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 11v2M11 11v2M15 11v2M6 17v2M12 17v2M18 17v2"/></svg></span>
+          <span class="kpi-label">Память (RAM)</span>
+          <span class="pill ok" id="b-ram">ожидание</span>
+        </div>
+        <div class="kpi-val"><span class="num" id="v-ram">—</span><span class="unit">%</span></div>
+        <div class="kpi-sub" id="d-ram">нет данных</div>
+        <canvas class="spark" id="s-ram"></canvas>
+        <div class="kpi-bar"><i id="bar-ram" style="width:0%"></i></div>
+      </div>
+
+      <div class="panel kpi" style="--kc:#fbbf24">
+        <div class="kpi-head">
+          <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5V12c0 1.7 3.6 3 8 3s8-1.3 8-3V5.5"/><path d="M4 12v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V12"/></svg></span>
+          <span class="kpi-label">Диск</span>
+          <span class="pill ok" id="b-disk">ожидание</span>
+        </div>
+        <div class="kpi-val"><span class="num" id="v-disk">—</span><span class="unit">%</span></div>
+        <div class="kpi-sub" id="d-disk">нет данных</div>
+        <canvas class="spark" id="s-disk"></canvas>
+        <div class="kpi-bar"><i id="bar-disk" style="width:0%"></i></div>
+      </div>
+
+      <div class="panel kpi" style="--kc:#f87171">
+        <div class="kpi-head">
+          <span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></span>
+          <span class="kpi-label">Температура CPU</span>
+          <span class="pill ok" id="b-net">ожидание</span>
+        </div>
+        <div class="kpi-val"><span class="num" id="v-net">—</span><span class="unit">°C</span></div>
+        <div class="kpi-sub" id="d-net">нет данных</div>
+        <canvas class="spark" id="s-net"></canvas>
+        <div class="kpi-bar"><i id="bar-net" style="width:0%"></i></div>
+      </div>
+    </div>
+
+    <section class="panel chart-panel">
+      <div class="panel-head">
+        <div>
+          <h3>Загрузка ресурсов</h3>
+          <div class="sub">CPU · ОЗУ · Диск, % (левая ось) · TEMP, °C (правая ось)</div>
+        </div>
+        
+        <div class="seg seg-sm" id="rangeSeg" style="margin-left: auto; margin-right: 12px;">
+          <button data-range="5м">5м</button>
+          <button data-range="15м" class="active">15м</button>
+          <button data-range="30м">30м</button>
+        </div>
+        <span class="pill ok" id="chartRangePill">окно: 15м</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="resourcesChart"></canvas>
+        <div class="chart-empty" id="mainEmpty">Ожидание данных от Go-бэкенда…</div>
+      </div>
+    </section>
+
+    <div class="side-col">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Состояние узла</h3>
+          <span class="pill ok" id="nodeStatus">Подключение…</span>
+        </div>
+        <div class="health-body">
+          <div class="gauge">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" class="g-bg"/>
+              <circle cx="60" cy="60" r="52" class="g-fg" id="gaugeFg" stroke-dashoffset="326.7"/>
+            </svg>
+            <div class="gauge-center"><div class="gauge-val" id="healthVal">—</div><div class="gauge-lbl" id="healthLbl">Индекс</div></div>
+          </div>
+          <div class="facts">
+            <div class="fact"><div class="fl">Хост</div><div class="fv" id="f-host">—</div></div>
+            <div class="fact"><div class="fl">ОС</div><div class="fv" id="f-id">—</div></div>
+            <div class="fact"><div class="fl">Источник</div><div class="fv">REST API · Go</div></div>
+            <div class="fact"><div class="fl">Сбор метрик</div><div class="fv">каждые 2 с</div></div>
+            <div class="fact"><div class="fl">Точек в буфере</div><div class="fv" id="f-points">0</div></div>
+            <div class="fact"><div class="fl">Обновлено</div><div class="fv" id="f-upd">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Последние замеры</h3><span class="count-badge" id="snapCount">0 точек</span></div>
+        <table class="snap-table">
+          <thead><tr><th>Время</th><th>CPU</th><th>RAM</th><th>Диск</th><th>Темп.</th></tr></thead>
+          <tbody id="snapBody"><tr><td colspan="5" style="color:var(--dim)">нет данных</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:320px">
+        <div class="panel-head"><h3>Журнал событий</h3><span class="count-badge" id="evCount">0</span></div>
+        <div class="events" id="eventList"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Последнее обновление: <b id="lastUpd">—</b> · опрос <b>1 с</b> · сбор в Go <b>2 с</b></span>
+    <span>Vitality Monitor · метрики: <b>cpu · ram · disk · temp</b></span>
+  </footer>
+</div>
 
 <script type="module">
 
-let App = null;
-try { App = await import('./wailsjs/go/main/App'); }
-catch (err) { console.warn('Wails: биндинги недоступны', err); }
+window.addEventListener('unload', () => {
+  if (window.location.hash === '#dashboard') {
+    navigator.sendBeacon("/api/dashboard_closed");
+  }
+});
+
+window.switchToDashboard = async function() {
+  try {
+    await fetch("/api/dashboard");
+  } catch (err) {}
+};
+
+window.switchToWidget = async function() {
+  try {
+    await fetch("/api/widget");
+  } catch (err) {}
+};
+
+function applyRoute() {
+  const hash = window.location.hash;
+  const widgetView = document.getElementById('view-widget');
+  const dashboardView = document.getElementById('view-dashboard');
+
+  if (hash === '#dashboard') {
+    if (widgetView) widgetView.style.display = 'none';
+    if (dashboardView) dashboardView.style.display = 'flex';
+  } else {
+    if (widgetView) widgetView.style.display = 'flex';
+    if (dashboardView) dashboardView.style.display = 'none';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', applyRoute);
 
 const COLORS = {cyan:'#22d3ee', violet:'#a78bfa', amber:'#fbbf24', red:'#f87171', green:'#34d399'};
 const RANGE_MS = {'5м':5*60000, '15м':15*60000, '30м':30*60000};
@@ -347,8 +439,7 @@ const MAX_POINTS = 900;
 const POLL_MS = 1000;
 const LS_PREFIX = 'pulseMon.v4.';
 
-let hosts = [];
-let currentHostId = null;
+let local = 'local';
 let currentRange = '15м';
 let paused = false;
 let apiOnline = null;
@@ -361,8 +452,6 @@ const fmtTime = d => d.toLocaleTimeString('ru-RU', {hour12:false});
 const fmtTick = v => fmtTime(new Date(v));
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const currentHost = () => hosts.find(h => String(h.id) === String(currentHostId)) || null;
-const hostLabel = () => currentHost()?.hostname || ('ID ' + currentHostId);
 
 function toMs(v){
   if (v == null) return null;
@@ -433,7 +522,7 @@ const resourcesChart = new Chart(document.getElementById('resourcesChart'), {
     interaction:{mode:'index', intersect:false},
     scales:{
       x:timeAxis(),
-      y:{beginAtZero:true, max:100, grid:{color:'rgba(134,148,168,.08)'}, ticks:{font:{size:10}, stepSize:25, callback:v=>v+'%'}},
+      y:{beginAtZero:true, grid:{color:'rgba(134,148,168,.08)'}, ticks:{font:{size:10}, stepSize:25, callback:v=>v+'%'}},
       y1:{position:'right', beginAtZero:true, suggestedMax:100, grid:{drawOnChartArea:false}, ticks:{font:{size:10}, callback:v=>v+'°'}}
     },
     plugins:{
@@ -449,36 +538,27 @@ const resourcesChart = new Chart(document.getElementById('resourcesChart'), {
 function normalizeHistory(raw){
   if (!Array.isArray(raw) || !raw.length) return [];
   const snaps = [];
-
   raw.forEach(slice => {
     if (!slice || !Array.isArray(slice.metrics)) return;
-
     const cur = { t: toMs(slice.check_time), cpu: 0, ram: 0, disk: 0, temp: 0 };
-
     slice.metrics.forEach(m => {
-      const name = String(m?.name || '').toLowerCase();
+      const name = String(m?.name || '').toUpperCase();
       const value = Number(m?.value);
       if (!name || isNaN(value)) return;
-      if (name === 'cpu')  cur.cpu  = value;
-      if (name === 'ram')  cur.ram  = value;
-      if (name === 'disk') cur.disk = value;
-      if (name === 'temp') cur.temp = value;
+      if (name === 'CPU')  cur.cpu  = value;
+      if (name === 'RAM')  cur.ram  = value;
+      if (name === 'DISK') cur.disk = value;
+      if (name === 'TEMP') cur.temp = value;
     });
-
     snaps.push(cur);
   });
-
   return snaps;
 }
 
 function emptyBuffer(){ return {t:[], cpu:[], ram:[], disk:[], temp:[]}; }
 
 function pushSnap(b, t, s){
-  b.t.push(t);
-  b.cpu.push(s.cpu || 0);
-  b.ram.push(s.ram || 0);
-  b.disk.push(s.disk || 0);
-  b.temp.push(s.temp || 0);
+  b.t.push(t); b.cpu.push(s.cpu || 0); b.ram.push(s.ram || 0); b.disk.push(s.disk || 0); b.temp.push(s.temp || 0);
   if (b.t.length > MAX_POINTS){ b.t.shift(); b.cpu.shift(); b.ram.shift(); b.disk.shift(); b.temp.shift(); }
 }
 
@@ -509,9 +589,7 @@ function mergeSnapshots(hostId, snaps){
     const t = (s.t != null) ? s.t : now - (snaps.length - 1 - i) * POLL_MS;
     if (t <= lastT) return;
     const li = b.t.length - 1;
-    if (li >= 0 &&
-        b.cpu[li] === (s.cpu||0) && b.ram[li] === (s.ram||0) &&
-        b.disk[li] === (s.disk||0) && b.temp[li] === (s.temp||0)) return;
+    if (li >= 0 && b.cpu[li] === (s.cpu||0) && b.ram[li] === (s.ram||0) && b.disk[li] === (s.disk||0) && b.temp[li] === (s.temp||0)) return;
     pushSnap(b, t, s);
     appended++;
   });
@@ -519,73 +597,54 @@ function mergeSnapshots(hostId, snaps){
   return appended;
 }
 
-async function loadHosts(){
-  let list = null;
+async function fetchMetrics(){
   try {
-    if (App && typeof App.GetHosts === 'function') list = await App.GetHosts();
-  } catch (e) { console.error('GetHosts:', e); }
-  if (!Array.isArray(list) || !list.length){
-    list = [{ id: 1, hostname: 'Локальный узел' }];
-  }
-  hosts = list.map(h => ({
-    id: h.id ?? h.ID ?? h.Id ?? 1,
-    hostname: h.hostname || h.Hostname || h.name || h.Name || ('host-' + (h.id ?? 1))
-  }));
-  renderTabs();
-  setApiStatus(true);
-  pushEvent('ok', `Список метрик загружен (${hosts.length})`, 'Go');
-  await selectHost(hosts[0].id);
-}
+    const res = await fetch("/api/metrics");
+    if (!res.ok) throw new Error("API не отвечает");
+    const raw = await res.json();
+    if (!raw || !Array.isArray(raw)) return;
 
-async function fetchMetrics(hostId = currentHostId){
-  if (!hostId) return;
-  if (!App || typeof App.GetHistory !== 'function') throw new Error('GetHistory недоступен');
-  const raw = await App.GetHistory();
-  setApiStatus(true);
-  const snaps = normalizeHistory(raw);
-  if (snaps.length) mergeSnapshots(hostId, snaps);
-  if (String(hostId) === String(currentHostId)){
+    setApiStatus(true);
+    const snaps = normalizeHistory(raw);
+    if (snaps.length) mergeSnapshots(local, snaps);
+    
     renderAll();
     maybeEvents();
     document.getElementById('lastUpd').textContent = fmtTime(new Date());
+  } catch (e) {
+    setApiStatus(false);
   }
 }
 
-function renderTabs(){
-  const wrap = document.getElementById('serverTabs');
-  wrap.innerHTML = '';
-  hosts.forEach(h => {
-    const b = document.createElement('button');
-    b.dataset.id = h.id;
-    b.innerHTML = `<span class="st"></span><span class="seg-txt">${escapeHtml(h.hostname)}<small>ID: ${escapeHtml(h.id)}</small></span>`;
-    b.addEventListener('click', () => selectHost(h.id));
-    wrap.appendChild(b);
-  });
-}
-function renderTabsError(msg){
-  document.getElementById('serverTabs').innerHTML = `<button disabled><span class="seg-txt">${escapeHtml(msg)}</span></button>`;
-}
-
-async function selectHost(id){
-  currentHostId = id;
-  document.querySelectorAll('#serverTabs button').forEach(b =>
-    b.classList.toggle('active', String(b.dataset.id) === String(id)));
-  if (!buffers[id]) buffers[id] = loadStored(id) || emptyBuffer();
-  await fetchMetrics(id).catch(e => { console.error(e); setApiStatus(false); });
-  renderAll();
+async function initSystemInfo() {
+  try {
+    const res = await fetch("/api/sysinfo");
+    const info = await res.json();
+    if (info) {
+      document.getElementById('sysHardware').textContent = 
+        `${info.hostname} · CPU: ${info.cpu_cores} cores · RAM: ${info.ram_total}`;
+      document.getElementById('f-host').textContent = info.hostname;
+      document.getElementById('f-id').textContent = info.os;
+    }
+  } catch (err) {
+    console.warn("Ошибка получения данных о системе:", err);
+  }
 }
 
 function renderAll(){
-  refreshCharts();
-  refreshKpis();
-  refreshHealth();
-  renderSnapTable();
-  refreshFacts();
-  updateRangePill();
+  refreshCharts(); refreshKpis(); refreshHealth(); renderSnapTable(); refreshFacts(); updateRangePill(); updateWidgetData();
+}
+
+function updateWidgetData() {
+  const b = buffers[local];
+  if (!b || !b.t.length) return;
+  document.getElementById('w-cpu').textContent = b.cpu.at(-1).toFixed(1);
+  document.getElementById('w-ram').textContent = b.ram.at(-1).toFixed(1);
+  document.getElementById('w-temp').textContent = Math.round(b.temp.at(-1));
 }
 
 function updateRangePill(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   document.getElementById('chartRangePill').textContent = `окно: ${currentRange} · данных: ${b ? fmtSpan(b) : '0с'}`;
 }
 
@@ -601,7 +660,7 @@ function windowPoints(b, minT){
 }
 
 function refreshCharts(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   const has = b && b.t.length > 0;
   document.getElementById('mainEmpty').style.display = has ? 'none' : 'grid';
 
@@ -652,7 +711,7 @@ function setKpi(key, val, dec, delta, deltaUnit, barPct, warnT, critT){
 }
 
 function refreshKpis(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   if (!b || !b.t.length) return;
   const last = k => b[k][b[k].length-1];
   const hasDelta = b.t.length > 1;
@@ -694,10 +753,7 @@ function drawSpark(cv, data, color){
 }
 
 function refreshHealth(){
-  const b = buffers[currentHostId];
-  const h = currentHost();
-  document.getElementById('f-host').textContent = h ? h.hostname : '—';
-  document.getElementById('f-id').textContent = h ? h.id : '—';
+  const b = buffers[local];
   document.getElementById('f-points').textContent = b ? b.t.length : 0;
   if (!b || !b.t.length) return;
   const cpu = b.cpu.at(-1), ram = b.ram.at(-1), dsk = b.disk.at(-1), temp = b.temp.at(-1);
@@ -715,12 +771,12 @@ function refreshHealth(){
 }
 
 function refreshFacts(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   if (b && b.t.length) document.getElementById('f-upd').textContent = fmtTime(new Date(b.t.at(-1)));
 }
 
 function renderSnapTable(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   const body = document.getElementById('snapBody');
   if (!b || !b.t.length){
     body.innerHTML = '<tr><td colspan="5" style="color:var(--dim)">нет данных</td></tr>';
@@ -749,12 +805,14 @@ function pushEvent(sev, text, srv){
   if (eventsArr.length > 30) eventsArr.pop();
   renderEvents();
 }
+
 function throttledEvent(key, sev, text, srv){
   const now = Date.now();
   if (evThrottle[key] && now - evThrottle[key] < 30000) return;
   evThrottle[key] = now;
   pushEvent(sev, text, srv);
 }
+
 function renderEvents(){
   document.getElementById('eventList').innerHTML = eventsArr.slice(0,12).map(e=>`
     <div class="event ${e.sev}">
@@ -766,15 +824,16 @@ function renderEvents(){
     </div>`).join('');
   document.getElementById('evCount').textContent = eventsArr.length;
 }
+
 function maybeEvents(){
-  const b = buffers[currentHostId];
+  const b = buffers[local];
   if (!b || !b.t.length) return;
-  const cpu = b.cpu.at(-1), ram = b.ram.at(-1), temp = b.temp.at(-1), name = hostLabel();
-  if (cpu > 90) throttledEvent('cpu-crit-'+currentHostId, 'crit', `Критическая нагрузка CPU (${cpu.toFixed(0)}%)`, name);
-  else if (cpu > 85) throttledEvent('cpu-warn-'+currentHostId, 'warn', `Высокая нагрузка CPU (${cpu.toFixed(0)}%)`, name);
-  if (ram > 90) throttledEvent('ram-crit-'+currentHostId, 'warn', `Высокое использование ОЗУ (${ram.toFixed(0)}%)`, name);
-  if (temp > 90) throttledEvent('temp-crit-'+currentHostId, 'crit', `Перегрев CPU (${temp.toFixed(0)}°C)`, name);
-  else if (temp > 80) throttledEvent('temp-warn-'+currentHostId, 'warn', `Высокая температура CPU (${temp.toFixed(0)}°C)`, name);
+  const cpu = b.cpu.at(-1), ram = b.ram.at(-1), temp = b.temp.at(-1), name = "Vitality";
+  if (cpu > 90) throttledEvent('cpu-crit-'+local, 'crit', `Критическая нагрузка CPU (${cpu.toFixed(0)}%)`, name);
+  else if (cpu > 85) throttledEvent('cpu-warn-'+local, 'warn', `Высокая нагрузка CPU (${cpu.toFixed(0)}%)`, name);
+  if (ram > 90) throttledEvent('ram-crit-'+local, 'warn', `Высокое использование ОЗУ (${ram.toFixed(0)}%)`, name);
+  if (temp > 90) throttledEvent('temp-crit-'+local, 'crit', `Перегрев CPU (${temp.toFixed(0)}°C)`, name);
+  else if (temp > 80) throttledEvent('temp-warn-'+local, 'warn', `Высокая температура CPU (${temp.toFixed(0)}°C)`, name);
 }
 
 function setApiStatus(ok){
@@ -786,7 +845,7 @@ function setApiStatus(ok){
   if (ok){
     pill.textContent = 'В сети'; pill.className = 'pill ok';
     if (!paused){ badge.className = 'live-badge'; document.getElementById('liveText').textContent = 'LIVE'; }
-    if (wasOffline) pushEvent('ok', 'Связь с Go-бэкендом восстановлена', 'Go');
+    if (wasOffline) pushEvent('ok', 'Связь с Go-бэкендом восстановлена', 'Go REST API');
   } else {
     pill.textContent = 'Нет связи'; pill.className = 'pill crit';
     badge.className = 'live-badge offline';
@@ -819,9 +878,10 @@ document.getElementById('pauseBtn').addEventListener('click', ()=>{
   pushEvent('info', paused ? 'Опрос метрик приостановлен' : 'Опрос метрик возобновлён', 'UI');
 });
 
+
 setInterval(()=>{
-  if (paused || !currentHostId) return;
-  fetchMetrics().catch(e => { console.error('Ошибка при получении метрик из Go:', e); setApiStatus(false); });
+  if (paused) return;
+  fetchMetrics();
 }, POLL_MS);
 
 setInterval(()=>{
@@ -831,7 +891,7 @@ setInterval(()=>{
     now.toLocaleDateString('ru-RU', {weekday:'short', day:'numeric', month:'short'});
 }, 1000);
 
-window.addEventListener('pagehide', ()=>{ if (currentHostId && buffers[currentHostId]) storeBuffer(currentHostId); });
+window.addEventListener('pagehide', ()=>{ if (buffers[local]) storeBuffer(local); });
 
 let resizeTimer;
 window.addEventListener('resize', ()=>{
@@ -839,13 +899,13 @@ window.addEventListener('resize', ()=>{
   resizeTimer = setTimeout(()=>refreshKpis(), 150);
 });
 
-pushEvent('info', 'Мониторинг запущен, инициализация Wails...', 'Система');
-if (App && typeof App.GetHistory === 'function'){
-  loadHosts();
-} else {
-  renderTabsError('Wails-биндинги не найдены: GetHistory() недоступен');
-  setApiStatus(false);
-}
+pushEvent('info', 'Vitality запущен, система готова', 'Система');
+setTimeout(() => {
+  initSystemInfo();
+  buffers[local] = loadStored(local) || emptyBuffer();
+  fetchMetrics();
+}, 500);
+
 </script>
 </body>
 </html>

@@ -47,6 +47,24 @@ export namespace main {
 		    return a;
 		}
 	}
+	export class SystemInfo {
+	    hostname: string;
+	    cpu_cores: number;
+	    ram_total: string;
+	    os: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SystemInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hostname = source["hostname"];
+	        this.cpu_cores = source["cpu_cores"];
+	        this.ram_total = source["ram_total"];
+	        this.os = source["os"];
+	    }
+	}
 
 }
 
