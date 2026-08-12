@@ -29,6 +29,9 @@ func main() {
 		case "/api/dashboard_closed":
 			myAppBackend.MarkDashboardClosed()
 			w.WriteHeader(http.StatusOK)
+		case "/api/quit":
+			w.WriteHeader(http.StatusOK)
+			myAppBackend.Quit()
 		case "/api/metrics":
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(myAppBackend.GetHistory())
@@ -57,7 +60,7 @@ func main() {
 	myAppBackend.appInstance = app
 
 	systray := app.SystemTray.New()
-	systray.SetLabel("Vitality")
+	systray.SetLabel("⚡")
 
 	trayMenu := app.NewMenu()
 	trayMenu.Add("Открыть виджет").OnClick(func(ctx *application.Context) {
@@ -69,6 +72,14 @@ func main() {
 	trayMenu.AddSeparator()
 	trayMenu.Add("Завершить работу").OnClick(func(ctx *application.Context) {
 		app.Quit()
+	})
+
+	systray.SetMenu(trayMenu)
+	systray.OnClick(func() {
+		myAppBackend.ToggleWidget()
+	})
+	systray.OnRightClick(func() {
+		systray.OpenMenu()
 	})
 
 	systray.SetMenu(trayMenu)

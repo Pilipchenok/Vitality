@@ -240,6 +240,9 @@ button:active:not(:disabled){transform:scale(.98)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Дашборд
     </button>
+    <button class="btn" style="border-color: rgba(248,113,113,0.3); color: var(--red); padding: 7px 11px;" onclick="quitApp()" title="Выйти из Vitality">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width: 14px; height: 14px;"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+    </button>
   </div>
 </div>
 
@@ -415,6 +418,14 @@ window.switchToWidget = async function() {
   try {
     await fetch("/api/widget");
   } catch (err) {}
+};
+
+window.quitApp = async function() {
+  try {
+    await fetch("/api/quit");
+  } catch (err) {
+    console.error("Ошибка при выходе:", err);
+  }
 };
 
 function applyRoute() {

@@ -257,3 +257,12 @@ func (a *App) MarkDashboardClosed() {
 	defer a.mu.Unlock()
 	a.dashboardWin = nil
 }
+
+func (a *App) Quit() {
+	if a.appInstance != nil {
+		go func() {
+			time.Sleep(100 * time.Millisecond)
+			a.appInstance.Quit()
+		}()
+	}
+}
