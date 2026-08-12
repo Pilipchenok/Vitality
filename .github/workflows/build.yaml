@@ -68,7 +68,8 @@ jobs:
           </dict>
           </plist>
           EOF
-          npx create-dmg bin/Vitality.app bin/
+
+          hdiutil create -volname "Vitality" -srcfolder bin/Vitality.app -ov -format UDZO bin/Vitality.dmg
 
       - name: Сборка для Windows
         if: runner.os == 'Windows'
