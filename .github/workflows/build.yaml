@@ -40,15 +40,20 @@ jobs:
           npm install
           npm run build
 
-      - name: Сборка и упаковка для macOS (.app и .dmg)
+      - name: Сборка и упаковка для macOS
         if: runner.os == 'macOS'
         run: |
-          mkdir -p bin/Vitality.app/Contents/MacOS
-          mkdir -p bin/Vitality.app/Contents/Resources
+          mkdir -p bin
+          mkdir -p Vitality.app/Contents/MacOS
+          mkdir -p Vitality.app/Contents/Resources
 
-          go build -o bin/Vitality.app/Contents/MacOS/Vitality .
+          go build -o Vitality.app/Contents/MacOS/Vitality .
 
-          cat <<EOF > bin/Vitality.app/Contents/Info.plist
+          if [ -f "icon.icns" ]; then
+            cp icon.icns Vitality.app/Contents/Resources/icon.icns
+          fi
+
+          cat <<EOF > Vitality.app/Contents/Info.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -69,7 +74,14 @@ jobs:
           </plist>
           EOF
 
-          hdiutil create -volname "Vitality" -srcfolder bin/Vitality.app -ov -format UDZO bin/Vitality.dmg
+          mkdir -p dmg_stage
+          cp -R Vitality.app dmg_stage/
+          ln -s /Applications dmg_stage/Applications
+
+          hdiutil create -volname "Vitality" -srcfolder dmg_stage -ov -format UDZO bin/Vitality.dmg
+          
+          # Очистка временных папок сборки
+          rm -rf dmg_stage Vitality.app
 
       - name: Сборка для Windows
         if: runner.os == 'Windows'
