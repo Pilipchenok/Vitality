@@ -4,4 +4,10 @@ import {main} from '../models';
 
 export function CollectMetrics():Promise<void>;
 
+export function ExpandToDashboard():Promise<void>;
+
 export function GetHistory():Promise<Array<main.SliceMetrics>>;
+
+export function GetSystemInfo():Promise<main.SystemInfo>;
+
+export function ShrinkToWidget():Promise<void>;

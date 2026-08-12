@@ -6,6 +6,18 @@ export function CollectMetrics() {
   return window['go']['main']['App']['CollectMetrics']();
 }
 
+export function ExpandToDashboard() {
+  return window['go']['main']['App']['ExpandToDashboard']();
+}
+
 export function GetHistory() {
   return window['go']['main']['App']['GetHistory']();
+}
+
+export function GetSystemInfo() {
+  return window['go']['main']['App']['GetSystemInfo']();
+}
+
+export function ShrinkToWidget() {
+  return window['go']['main']['App']['ShrinkToWidget']();
 }
