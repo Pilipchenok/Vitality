@@ -40,11 +40,35 @@ jobs:
           npm install
           npm run build
 
-      - name: Сборка для macOS
+      - name: Сборка и упаковка для macOS (.app и .dmg)
         if: runner.os == 'macOS'
         run: |
-          mkdir -p bin
-          go build -o bin/Vitality .
+          mkdir -p bin/Vitality.app/Contents/MacOS
+          mkdir -p bin/Vitality.app/Contents/Resources
+
+          go build -o bin/Vitality.app/Contents/MacOS/Vitality .
+
+          cat <<EOF > bin/Vitality.app/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>Vitality</string>
+              <key>CFBundleIconFile</key>
+              <string>icon.icns</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.vitality.monitor</string>
+              <key>CFBundleName</key>
+              <string>Vitality</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>LSUIElement</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+          npx create-dmg bin/Vitality.app bin/
 
       - name: Сборка для Windows
         if: runner.os == 'Windows'
